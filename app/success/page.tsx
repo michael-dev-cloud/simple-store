@@ -17,7 +17,7 @@ export default function SuccessPage({
   useEffect(() => {
     const fetchOrder = async () => {
       if (!searchParams.session_id) {
-        setError("No session found");
+        setError("No session ID found in request.");
         setLoading(false);
         return;
       }
@@ -32,11 +32,11 @@ export default function SuccessPage({
           setOrderData(data);
           clearCart();
         } else {
-          setError(data.error || "Failed to fetch order");
+          setError(data.error || "Failed to fetch order details.");
         }
       } catch (err) {
         console.error("Error fetching order:", err);
-        setError("Failed to fetch order details");
+        setError("Failed to fetch order details.");
       } finally {
         setLoading(false);
       }
@@ -47,151 +47,171 @@ export default function SuccessPage({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-600">Loading order details...</p>
+      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+        <p className="text-zinc-500 text-xs tracking-widest uppercase animate-pulse">Retrieving order details...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-gray-900">T-Shirt Store</h1>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-3xl mx-auto px-4 py-12">
+    <div className="min-h-screen bg-zinc-950 text-neutral-100 py-16 flex flex-col justify-center items-center px-4">
+      <div className="max-w-2xl w-full bg-zinc-900 border border-neutral-900 rounded-lg p-8 md:p-12 space-y-10">
         {error ? (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-8 py-6 rounded-lg text-center">
-            <h2 className="text-2xl font-bold mb-2">Order Error</h2>
-            <p className="mb-4">{error}</p>
-            <Link
-              href="/"
-              className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
-            >
-              Back to Store
-            </Link>
+          <div className="text-center space-y-6">
+            <div className="inline-flex items-center justify-center w-12 h-12 bg-red-950/40 border border-red-900 rounded-full text-red-500 font-bold text-lg">
+              !
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-xl font-black uppercase text-white tracking-tight">Order Verification Failed</h2>
+              <p className="text-xs text-neutral-500 max-w-sm mx-auto leading-relaxed">{error}</p>
+            </div>
+            <div className="pt-4">
+              <Link
+                href="/"
+                className="bg-white text-black text-xs font-black uppercase tracking-widest px-8 py-3.5 rounded hover:bg-neutral-200 transition-colors"
+              >
+                Back to Store
+              </Link>
+            </div>
           </div>
         ) : orderData ? (
-          <div className="bg-white rounded-lg shadow-md p-8">
-            {/* Success Message */}
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-                <svg
-                  className="w-8 h-8 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
+          <>
+            {/* Checked Success Header */}
+            <div className="text-center space-y-4">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-emerald-950/40 border border-emerald-900 rounded-full text-emerald-400 font-bold text-lg animate-pulse">
+                ✓
               </div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Order Confirmed!
-              </h1>
-              <p className="text-gray-600 text-lg">
-                Thank you for your purchase. Your order has been received.
-              </p>
+              <div className="space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">
+                  Payment Complete
+                </span>
+                <h1 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tight">
+                  Welcome to the VØID
+                </h1>
+                <p className="text-xs text-neutral-500">
+                  Your order has been received. A confirmation has been sent to <span className="text-neutral-300 font-semibold">{orderData.email}</span>.
+                </p>
+              </div>
             </div>
 
-            {/* Order Details */}
-            <div className="border-t border-b py-6 mb-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">
-                Order Details
+            {/* Shipment Progress Stepper */}
+            <div className="py-6 border-t border-b border-neutral-950">
+              <h3 className="text-[10px] font-black uppercase tracking-widest text-neutral-500 text-center mb-6">
+                Shipment Progress
+              </h3>
+              <div className="grid grid-cols-4 relative text-center">
+                {/* Connector line */}
+                <div className="absolute top-2.5 left-[12.5%] right-[12.5%] h-0.5 bg-neutral-800 -z-10">
+                  <div className="h-full bg-white w-1/3 transition-all"></div>
+                </div>
+                {/* Step 1 */}
+                <div className="space-y-2">
+                  <div className="w-5.5 h-5.5 rounded-full bg-white text-black text-[9px] font-black flex items-center justify-center mx-auto border border-neutral-900">
+                    1
+                  </div>
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-white">Placed</p>
+                </div>
+                {/* Step 2 */}
+                <div className="space-y-2">
+                  <div className="w-5.5 h-5.5 rounded-full bg-zinc-900 text-white text-[9px] font-black flex items-center justify-center mx-auto border border-white">
+                    2
+                  </div>
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-white">Processing</p>
+                </div>
+                {/* Step 3 */}
+                <div className="space-y-2">
+                  <div className="w-5.5 h-5.5 rounded-full bg-zinc-950 text-neutral-500 text-[9px] font-black flex items-center justify-center mx-auto border border-neutral-850">
+                    3
+                  </div>
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-neutral-500">Dispatched</p>
+                </div>
+                {/* Step 4 */}
+                <div className="space-y-2">
+                  <div className="w-5.5 h-5.5 rounded-full bg-zinc-950 text-neutral-500 text-[9px] font-black flex items-center justify-center mx-auto border border-neutral-850">
+                    4
+                  </div>
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-neutral-500">Delivered</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Order Details Details */}
+            <div className="space-y-6">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-white pb-3 border-b border-neutral-950">
+                Order Summary
               </h2>
 
-              <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="grid grid-cols-2 gap-6 text-xs">
                 <div>
-                  <p className="text-sm text-gray-600">Order ID</p>
-                  <p className="text-lg font-semibold text-gray-900">
-                    {orderData.id.substring(0, 12)}...
-                  </p>
+                  <p className="text-neutral-500 uppercase tracking-wider text-[9px] font-bold">Order Reference</p>
+                  <p className="font-semibold text-neutral-300 mt-1">{orderData.id}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Email</p>
-                  <p className="text-lg font-semibold text-gray-900">
-                    {orderData.email}
+                  <p className="text-neutral-500 uppercase tracking-wider text-[9px] font-bold">Stripe Payment ID</p>
+                  <p className="font-semibold text-neutral-300 mt-1 text-ellipsis overflow-hidden whitespace-nowrap">
+                    {orderData.stripeId}
                   </p>
                 </div>
               </div>
 
-              {/* Items */}
-              <div className="mb-4">
-                <p className="text-sm font-medium text-gray-600 mb-2">Items Ordered</p>
-                <div className="space-y-2">
+              {/* Items List */}
+              <div className="pt-4 border-t border-neutral-950 space-y-3">
+                <p className="text-neutral-500 uppercase tracking-wider text-[9px] font-bold">Items Purchased</p>
+                <div className="divide-y divide-neutral-950/50">
                   {orderData.items && orderData.items.length > 0 ? (
-                    orderData.items.map((item: any, index: number) => (
-                      <div key={index} className="flex justify-between text-sm">
-                        <span className="text-gray-700">
-                          Quantity: {item.quantity} × ${item.price.toFixed(2)}
-                          {item.color && ` (${item.color})`}
-                        </span>
-                        <span className="font-medium">
-                          ${(item.quantity * item.price).toFixed(2)}
+                    orderData.items.map((item: any, idx: number) => (
+                      <div key={idx} className="flex justify-between items-center py-2 text-xs">
+                        <div className="space-y-1">
+                          <p className="font-bold text-white uppercase tracking-wider">
+                            {item.productName || `Piece #${item.productId.substring(0,6)}`}
+                          </p>
+                          <div className="flex gap-2 text-[9px] uppercase font-semibold text-neutral-500">
+                            <span>Color: {item.color}</span>
+                            <span>Size: {item.size}</span>
+                          </div>
+                        </div>
+                        <span className="font-black text-neutral-400">
+                          {item.quantity} × ${item.price.toFixed(2)}
                         </span>
                       </div>
                     ))
                   ) : (
-                    <p className="text-gray-600">No items in order</p>
+                    <p className="text-xs text-neutral-500">No details available.</p>
                   )}
                 </div>
               </div>
 
-              <div className="flex justify-between pt-4 border-t">
-                <span className="text-lg font-bold text-gray-900">Total</span>
-                <span className="text-2xl font-bold text-blue-600">
-                  ${orderData.total.toFixed(2)}
-                </span>
+              {/* Total Row */}
+              <div className="flex justify-between items-center pt-4 border-t border-neutral-950">
+                <span className="text-xs font-bold uppercase tracking-wider text-white">Amount Paid</span>
+                <span className="text-lg font-black text-white">${orderData.total.toFixed(2)}</span>
               </div>
             </div>
 
-            {/* Order Status */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-              <h3 className="font-semibold text-blue-900 mb-2">What's Next?</h3>
-              <ul className="text-sm text-blue-800 space-y-1">
-                <li>✓ Your order has been received and confirmed</li>
-                <li>✓ A confirmation email has been sent to {orderData.email}</li>
-                <li>• Your order will be prepared for shipment</li>
-                <li>• You'll receive a tracking number via email</li>
-              </ul>
-            </div>
-
-            {/* Actions */}
-            <div className="flex gap-4">
+            {/* Actions button */}
+            <div className="pt-6 flex flex-col sm:flex-row gap-4">
               <Link
                 href="/"
-                className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 text-center font-bold"
+                className="flex-1 bg-white text-black text-xs font-black uppercase tracking-widest py-4 rounded hover:bg-neutral-200 text-center transition-colors"
               >
                 Continue Shopping
               </Link>
-              <a
-                href={`mailto:${orderData.email}`}
-                className="flex-1 bg-gray-200 text-gray-900 px-6 py-3 rounded-lg hover:bg-gray-300 text-center font-bold"
+            </div>
+          </>
+        ) : (
+          <div className="text-center space-y-6">
+            <p className="text-neutral-550 text-sm">No order information found.</p>
+            <div className="pt-4">
+              <Link
+                href="/"
+                className="bg-white text-black text-xs font-black uppercase tracking-widest px-8 py-3.5 rounded hover:bg-neutral-200 transition-colors"
               >
-                View Confirmation Email
-              </a>
+                Back to Store
+              </Link>
             </div>
           </div>
-        ) : (
-          <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <p className="text-gray-600 text-lg mb-4">No order data found</p>
-            <Link
-              href="/"
-              className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
-            >
-              Back to Store
-            </Link>
-          </div>
         )}
-      </main>
+      </div>
     </div>
   );
 }

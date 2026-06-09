@@ -1,0 +1,23 @@
+{
+  "name": "Next.js Dev Container",
+  "image": "node:20",
+  "working_dir": "/app",
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "Next.js App"
+    }
+  },
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/app,type=bind",
+    "source=node_modules,target=/app/node_modules,type=volume"
+  ],
+  "postCreateCommand": "npm install",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint"
+      ]
+    }
+  }
+}

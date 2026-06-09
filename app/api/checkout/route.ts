@@ -1,13 +1,18 @@
 import Stripe from "stripe";
-import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
+async function getPrisma() {
+  try {
+    const mod = await import('../../lib/prisma-client');
+    return mod.getPrisma ? await mod.getPrisma() : mod.default || null;
+  } catch (error) {
+    console.error('Prisma lazy-load error:', error);
+    return null;
+  }
+}
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2024-12-15",
+  apiVersion: "2026-05-27.dahlia" as any,
 });
-
-const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
   try {
@@ -70,25 +75,41 @@ export async function GET(req: Request) {
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
     if (session.payment_status === "paid") {
-      // Create order in database
-      const items = session.metadata?.items ? JSON.parse(session.metadata.items) : [];
-      
-      const order = await prisma.order.create({
-        data: {
-          email: session.customer_email || "",
-          total: (session.amount_total || 0) / 100,
-          stripeId: session.id,
-          status: "completed",
-          items: {
-            create: items.map((item: any) => ({
-              productId: item.productId,
-              color: item.color,
-              quantity: item.quantity,
-              price: item.price,
-            })),
-          },
-        },
+      // Check if order already exists to prevent duplicate insertion error on page refresh
+      const prisma = await getPrisma();
+
+      if (!prisma) {
+        console.warn('Prisma client unavailable; skipping order creation.');
+        return Response.json({ error: 'Prisma client unavailable' }, { status: 500 });
+      }
+
+      let order = await prisma.order.findUnique({
+        where: { stripeId: session.id },
+        include: { items: true },
       });
+
+      if (!order) {
+        const items = session.metadata?.items ? JSON.parse(session.metadata.items) : [];
+        
+        order = await prisma.order.create({
+          data: {
+            email: session.customer_email || "",
+            total: (session.amount_total || 0) / 100,
+            stripeId: session.id,
+            status: "completed",
+            items: {
+              create: items.map((item: any) => ({
+                productId: item.productId,
+                color: item.color,
+                size: item.size || "M",
+                quantity: item.quantity,
+                price: item.price,
+              })),
+            },
+          },
+          include: { items: true },
+        });
+      }
 
       return Response.json(order);
     }
